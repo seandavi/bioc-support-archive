@@ -16,6 +16,7 @@ All generated links are root-relative, so the output works on any host.
 import hashlib
 import html
 import json
+import os
 import re
 import shutil
 import sqlite3
@@ -228,10 +229,21 @@ def main(db_path, out, force=False, sample=0):
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(text)
             changed += 1
+    # Uploaded images (from `just fetch-media`), hard-linked in. UUID names never change, so size is the hash.
+    media = Path(db_path).parent / "raw" / "media"
+    linked = 0
+    for f in media.rglob("*") if media.exists() else ():
+        if f.is_file():
+            rel = str(f.relative_to(media.parent))
+            new[rel] = str(f.stat().st_size)
+            if not (out / rel).exists():
+                (out / rel).parent.mkdir(parents=True, exist_ok=True)
+                os.link(f, out / rel)
+                linked += 1
     removed = old.keys() - new.keys()
     for rel in removed:
         (out / rel).unlink(missing_ok=True)
-    print(f"{len(site.roots)} threads: {changed} files written, {len(removed)} removed")
+    print(f"{len(site.roots)} threads: {changed} files written, {linked} media linked, {len(removed)} removed")
     if changed or removed or not (out / "pagefind").exists():
         print("rebuilding search index")
         write_index(out)

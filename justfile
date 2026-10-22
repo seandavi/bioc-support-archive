@@ -12,6 +12,16 @@ default:
 fetch:
     cp -pv "$(ls -1 {{backups}}/bio-database-daily-*.gz | tail -1)" data/raw/
 
+# Download uploaded images from the live site (skips files already fetched; 4 at a time)
+fetch-media:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    uv run pipeline/media_paths.py data/bioc-support-full.duckdb > data/raw/media-paths.txt
+    wc -l < data/raw/media-paths.txt
+    xargs -P4 -I{} sh -c '[ -s "data/raw{}" ] || curl -sf --create-dirs -o "data/raw{}" "https://support.bioconductor.org{}" || echo "missing {}"' \
+      < data/raw/media-paths.txt | tee data/raw/media-missing.txt
+    find data/raw/media -type f | wc -l
+
 # Restore a dump (default: newest in data/raw) into a throwaway Postgres; export DuckDB + public SQLite
 export dump="":
     #!/usr/bin/env bash
