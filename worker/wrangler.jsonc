@@ -1,0 +1,8 @@
+{
+  "name": "bioc-support-archive",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-01",
+  "r2_buckets": [{ "binding": "ARCHIVE", "bucket_name": "bioc-support-archive" }],
+  // Overridden on every dev/deploy from data/build/BUILD_ID (see justfile).
+  "vars": { "BUILD_ID": "unset" }
+}

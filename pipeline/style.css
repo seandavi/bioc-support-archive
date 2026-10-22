@@ -1,0 +1,17 @@
+body { font: 16px/1.5 system-ui, sans-serif; margin: 0; color: #222; }
+header { display: flex; gap: 1rem; align-items: center; justify-content: space-between; padding: .6rem 1rem; background: #1a81c2; }
+header .brand { color: #fff; font-weight: 600; text-decoration: none; }
+header .brand span { font-weight: 400; opacity: .8; }
+header input { padding: .35rem .6rem; border: 0; border-radius: 4px; width: 18rem; max-width: 50vw; }
+main { max-width: 60rem; margin: 0 auto; padding: 1rem; }
+footer { max-width: 60rem; margin: 2rem auto; padding: 1rem; color: #666; font-size: .9rem; border-top: 1px solid #ddd; }
+.meta, small, .byline { color: #666; font-size: .9rem; }
+.tag { display: inline-block; background: #e8f1f8; color: #1a5f8f; border-radius: 3px; padding: 0 .4rem; margin: 0 .3rem .3rem 0; font-size: .85rem; }
+.post { border-top: 1px solid #ddd; padding: .8rem 0; }
+.post .kind { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: #888; }
+.post.accepted > .kind { color: #2a8a2a; font-weight: 600; }
+.post.comment { border-top: 1px dashed #e4e4e4; font-size: .95rem; }
+.children { margin-left: 1.2rem; }
+.content pre { background: #f6f8fa; padding: .6rem; overflow-x: auto; }
+.content img { max-width: 100%; }
+.listing li { margin: .3rem 0; }
