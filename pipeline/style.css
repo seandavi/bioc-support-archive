@@ -6,6 +6,7 @@
   --pf-outline-focus: var(--blue); --pf-border-radius: 6px;
   --pf-result-title-font-size: 15px; --pf-result-excerpt-font-size: 14px;
 }
+/* style.css loads after Pagefind's CSS, so these overrides win over its :root defaults */
 @media (prefers-color-scheme: dark) {
   :root {
     --blue: #5fb0e8; --green: #a3cc5e; --ink: #e4e8ec; --muted: #9aa5af; --line: #2c343c;
@@ -92,7 +93,9 @@ li:target, article:target { outline: 2px solid var(--green); outline-offset: 4px
 
 /* search page */
 .filters { display: flex; flex-wrap: wrap; gap: .5rem; margin: .8rem 0; }
-pagefind-summary { display: block; margin: .6rem 0; }
+pagefind-summary { display: block; margin: .6rem 0 .2rem; }
+.hint { color: var(--muted); font-size: .8rem; margin: 0 0 .4rem; }
+pagefind-results { color: var(--ink); } /* Pagefind resets it to CanvasText (black), even in dark mode */
 .result { list-style: none; padding: .8rem 0; border-bottom: 1px solid var(--line); }
 .result-title { font-size: 1.05rem; font-weight: 600; }
 .result-meta { color: var(--muted); font-size: .82rem; margin: .15rem 0 .3rem; }

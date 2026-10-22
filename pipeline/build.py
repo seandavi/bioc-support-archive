@@ -27,6 +27,9 @@ from pathlib import Path
 from urllib.parse import quote
 
 TYPES = {0: "Question", 1: "Answer", 2: "Job", 6: "Comment", 8: "Tutorial", 11: "News"}
+# ponytail: Pagefind's component UI renders an element per hit (9k for "limma": 13 s of style recalc), with no
+# "load more", so result lists are capped. Add paging if people need to go past the top hits.
+MAX_RESULTS, MAX_MODAL_RESULTS = 100, 50
 MIN_TAG_FILTER = 50  # ponytail: only common tags become search filters; 11k tags would swamp the filter list
 OLD_HOST = re.compile(r"https?://(?:www\.)?support\.bioconductor\.org(?=[/\"'?#<\s]|$)", re.I)
 e = html.escape
@@ -57,14 +60,17 @@ def page(title, body, extra_head="", wide=False):
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{e(title)} | Bioconductor Support archive</title>
-<link rel="stylesheet" href="/{CSS_PATH}">{ANALYTICS}{SEARCH_HEAD}{extra_head}
+{SEARCH_HEAD}
+<link rel="stylesheet" href="/{CSS_PATH}">{ANALYTICS}{extra_head}
 </head><body>
 <header class="site"><div class="wrap">
 <a class="brand" href="/"><span class="b1">Bioconductor</span> <span class="b2">Support</span> <span class="pill">archive</span></a>
 <nav><a href="/">Home</a><a href="/search/">Search</a>
 <pagefind-modal-trigger instance="modal" placeholder="Search the archive"></pagefind-modal-trigger></nav>
 </div></header>
-<pagefind-modal instance="modal"></pagefind-modal>
+<pagefind-modal instance="modal"><pagefind-modal-header><pagefind-input instance="modal"></pagefind-input></pagefind-modal-header>
+<pagefind-modal-body><pagefind-summary instance="modal"></pagefind-summary><pagefind-results instance="modal" max-results="{MAX_MODAL_RESULTS}"></pagefind-results></pagefind-modal-body>
+<pagefind-modal-footer><pagefind-keyboard-hints instance="modal"></pagefind-keyboard-hints></pagefind-modal-footer></pagefind-modal>
 <div class="notice"><div class="wrap">This is a read-only archive of support.bioconductor.org (2001&ndash;2026). Posting and accounts are closed.</div></div>
 <main class="wrap{' wide' if wide else ''}">{body}</main>
 <footer class="wrap">Bioconductor Support archive &middot; content contributed by the Bioconductor community</footer>
@@ -135,14 +141,15 @@ class Site:
         answers.sort(key=lambda a: (-(a["accept_count"] > 0), -a["vote_count"], a["id"]))
         tags = [t for t in r["tags"].split(",") if t]
         kind, date = TYPES.get(r["type"], "Post"), r["creation_date"][:10]
-        hidden = "".join([
+        # Inside data-pagefind-ignore so the values are captured as filters/meta but kept out of excerpts.
+        hidden = "<div hidden data-pagefind-ignore>" + "".join([
             f'<span hidden data-pagefind-filter="type">{kind}</span>',
             f'<span hidden data-pagefind-filter="year">{date[:4]}</span>',
             *(f'<span hidden data-pagefind-filter="tag">{e(t)}</span>' for t in tags if t in self.filter_tags),
             f'<span hidden data-pagefind-meta="date">{date}</span>',
             f'<span hidden data-pagefind-meta="type">{kind}</span>',
             f'<span hidden data-pagefind-meta="answers">{len(answers)}</span>',
-        ])
+        ]) + "</div>"
         head = f"{len(answers)} answer{'s' if len(answers) != 1 else ''}"
         side = (f'<aside><dl><dt>Asked</dt><dd>{date}</dd><dt>Type</dt><dd>{kind}</dd>'
                 f'<dt>Answers</dt><dd>{len(answers)}</dd><dt>Views</dt><dd>{num(r["view_count"])}</dd>'
@@ -178,7 +185,7 @@ Bioconductor community, 2001&ndash;2026.</p>
 <section><h2>Most recent</h2>{self.listing(recent)}</section></div>""")
         yield "search/index.html", page("Search", f"""
 <h1>Search</h1>
-<pagefind-config faceted excerpt-length="40"></pagefind-config>
+<pagefind-config excerpt-length="40"></pagefind-config>
 <pagefind-input placeholder="Search {num(len(self.roots))} threads" autofocus></pagefind-input>
 <div class="filters">
 <pagefind-filter-dropdown filter="type" label="Type"></pagefind-filter-dropdown>
@@ -186,7 +193,8 @@ Bioconductor community, 2001&ndash;2026.</p>
 <pagefind-filter-dropdown filter="tag" label="Tag" sort="count-desc"></pagefind-filter-dropdown>
 </div>
 <pagefind-summary></pagefind-summary>
-<pagefind-results><script type="text/pagefind-template">
+<p class="hint">Ranked by relevance; the top {MAX_RESULTS} are listed. Add words or filters to narrow the search.</p>
+<pagefind-results max-results="{MAX_RESULTS}"><script type="text/pagefind-template">
 <li class="result"><a class="result-title" href="{{{{ meta.url | default(url) | safeUrl }}}}">{{{{ meta.title }}}}</a>
 <div class="result-meta">{{{{ meta.type }}}} &middot; {{{{ meta.date }}}} &middot; {{{{ meta.answers }}}} answers</div>
 {{{{#if excerpt}}}}<p class="result-excerpt">{{{{+ excerpt +}}}}</p>{{{{/if}}}}</li>
@@ -195,6 +203,10 @@ Bioconductor community, 2001&ndash;2026.</p>
 // Keep ?q= and ?tag= in sync with the search, so searches can be linked and bookmarked.
 await customElements.whenDefined("pagefind-input");
 const search = window.PagefindComponents.getInstanceManager().getInstance("default");
+// Faceted mode (needed for filter-only searches like ?tag=) is switched on after the index loads: set up
+// front, Pagefind opens with an unfiltered match-everything search (~6 s on 47k threads) that blocks this one.
+if (!search.availableFilters) await new Promise((r) => {{ search.on("filters", () => setTimeout(r)); search.triggerLoad(); }});
+search.faceted = true;
 const params = new URLSearchParams(location.search);
 const q = params.get("q") ?? "", tags = params.getAll("tag");
 if (q || tags.length) search.triggerSearchWithFilters(q, tags.length ? {{ tag: tags }} : {{}});
