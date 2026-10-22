@@ -64,9 +64,10 @@ smoke b=build port="8787":
     echo ok
 
 # Upload the build to the real R2 bucket, then deploy the Worker with the new BUILD_ID
-publish bucket="bioc-support-archive":
-    rclone sync --checksum --exclude .manifest.json --transfers 64 --fast-list {{build}} r2:{{bucket}}
-    cd worker && npx wrangler deploy --var BUILD_ID:$(cat ../{{build}}/BUILD_ID)
+publish b=build bucket="bioc-support-archive":
+    rclone mkdir r2:{{bucket}}
+    rclone sync --checksum --exclude .manifest.json --transfers 64 --checkers 64 --fast-list {{b}} r2:{{bucket}}
+    cd worker && npx wrangler deploy --var BUILD_ID:$(cat ../{{b}}/BUILD_ID)
 
 # Full pipeline from the newest backup
 all: fetch export build sync-local
