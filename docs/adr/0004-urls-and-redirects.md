@@ -11,7 +11,9 @@ Date: 2026-10-22 · Status: accepted
   localhost, the tailnet, workers.dev or the real domain.
 
 ## Consequences
-- Other old paths (`/t/<tag>/`, `/u/<user>/`) return 404 until they are added.
+- `/u/<user uid>/` serves a profile page: display name, join date, post counts (including accepted
+  answers) and links to the user's questions and answers (issue #4). Author names link there.
+- Other old paths (`/t/<tag>/`) return 404 until they are added (issue #6).
 - Uploaded images are not in the database. `just fetch-media` downloads every `/media/images/` path referenced by
   any post (2,189 files, 248 MB, fetched 2026-10-22 from the live site) into `data/raw/media/`; the build hard-links
   them to the same paths. Files have no extension and are served as `application/octet-stream`, as on the live site.
