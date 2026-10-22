@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using these metadata."
+title: "bioc-support-archive: a static archive of the Bioconductor support site"
+type: software
+authors:
+  - family-names: Davis
+    given-names: Sean
+    orcid: "https://orcid.org/0000-0002-8991-6458"
+    affiliation: "University of Colorado Anschutz Medical Campus"
+abstract: >-
+  Tools to convert the database of support.bioconductor.org, the Bioconductor community's
+  question-and-answer site (2001-2026), into a static, searchable, read-only archive that keeps
+  the original URLs. The pipeline restores a PostgreSQL dump, exports a privacy-filtered public
+  subset, renders static HTML with a Pagefind search index, and serves it from Cloudflare R2
+  through a Cloudflare Worker.
+version: 0.1.0
+license: MIT
+repository-code: "https://github.com/seandavi/bioc-support-archive"
+url: "https://bioc-support-archive.seandavi.workers.dev"
+keywords:
+  - Bioconductor
+  - web archive
+  - static site
+  - Cloudflare Workers
+  - Pagefind

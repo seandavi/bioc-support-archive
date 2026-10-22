@@ -3,6 +3,7 @@ name = "bioc-support-archive"
 version = "0.1.0"
 description = "Static archive of support.bioconductor.org"
 requires-python = ">=3.11"
+license = "MIT"
 dependencies = ["duckdb>=1.4,<1.5", "pagefind[bin]>=1.3"]
 
 [dependency-groups]

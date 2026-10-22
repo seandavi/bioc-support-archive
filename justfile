@@ -42,6 +42,10 @@ build *flags:
 test:
     uv run pytest -q pipeline
 
+# Regenerate docs figures from their stdlib Python sources
+figures:
+    python3 docs/figures/data_flow.py
+
 # Mirror a build into wrangler's local R2 (incremental). Stops `just dev`: both lock the store.
 sync-local b=build s=state:
     -pkill -f 'node_modules/.bin/[w]rangler dev' && sleep 2

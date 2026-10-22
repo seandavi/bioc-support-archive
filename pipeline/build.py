@@ -65,7 +65,7 @@ def page(title, body, extra_head="", wide=False):
 <pagefind-modal-trigger instance="modal" placeholder="Search the archive"></pagefind-modal-trigger></nav>
 </div></header>
 <pagefind-modal instance="modal"></pagefind-modal>
-<div class="notice"><div class="wrap">This is a read-only archive of support.bioconductor.org (2002&ndash;2026). Posting and accounts are closed.</div></div>
+<div class="notice"><div class="wrap">This is a read-only archive of support.bioconductor.org (2001&ndash;2026). Posting and accounts are closed.</div></div>
 <main class="wrap{' wide' if wide else ''}">{body}</main>
 <footer class="wrap">Bioconductor Support archive &middot; content contributed by the Bioconductor community</footer>
 </body></html>"""
@@ -170,7 +170,7 @@ class Site:
         yield "index.html", page("Home", f"""
 <section class="hero"><h1>Bioconductor Support archive</h1>
 <p>{num(len(self.roots))} questions and {num(len(self.posts) - len(self.roots))} answers and comments from the
-Bioconductor community, 2002&ndash;2026.</p>
+Bioconductor community, 2001&ndash;2026.</p>
 <form action="/search/" method="get"><input type="search" name="q" placeholder="Search, e.g. DESeq2 lfcShrink" aria-label="Search the archive">
 <button>Search</button></form></section>
 <section><h2>Popular tags</h2><div class="tags">{tags}</div></section>
