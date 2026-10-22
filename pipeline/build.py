@@ -38,6 +38,14 @@ def rewrite_links(s):
     return OLD_HOST.sub("", s)
 
 
+# Bioconductor's GA4 property (same as bioconductor.org); production hostname only, so demos and local builds don't count.
+ANALYTICS = """
+<script>if (location.hostname === "support.bioconductor.org") {
+  const s = document.createElement("script"); s.async = true;
+  s.src = "https://www.googletagmanager.com/gtag/js?id=G-WJMEEH1J58"; document.head.append(s);
+  window.dataLayer = window.dataLayer || []; window.gtag = function () { dataLayer.push(arguments); };
+  gtag("js", new Date()); gtag("config", "G-WJMEEH1J58");
+}</script>"""
 SEARCH_HEAD = """
 <link rel="stylesheet" href="/pagefind/pagefind-component-ui.css">
 <script src="/pagefind/pagefind-component-ui.js" type="module"></script>"""
@@ -48,7 +56,7 @@ def page(title, body, extra_head="", wide=False):
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{e(title)} | Bioconductor Support archive</title>
-<link rel="stylesheet" href="/{CSS_PATH}">{SEARCH_HEAD}{extra_head}
+<link rel="stylesheet" href="/{CSS_PATH}">{ANALYTICS}{SEARCH_HEAD}{extra_head}
 </head><body>
 <header class="site"><div class="wrap">
 <a class="brand" href="/"><span class="b1">Bioconductor</span> <span class="b2">Support</span> <span class="pill">archive</span></a>
