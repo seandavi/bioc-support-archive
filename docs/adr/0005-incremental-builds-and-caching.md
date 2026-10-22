@@ -10,8 +10,8 @@ cached as long as possible, but a new build must show up at once.
 - `build.py` keeps a manifest of content hashes. It writes only pages that changed, deletes
   pages for threads that are gone, and rebuilds the Pagefind index only when something changed
   (Pagefind itself cannot update an index in place).
-- Uploads are incremental by checksum: `rclone sync --checksum` for real R2, and an
-  MD5-vs-ETag comparison for the local R2 used by `wrangler dev`.
+- Uploads are incremental by checksum: `rclone sync --checksum` for real R2, and for the local R2 used by `wrangler dev`, a
+  record of the MD5 last pushed per key, with changes sent through `wrangler r2 bulk put --local`.
 - Each build writes a `BUILD_ID` (a hash of the manifest), and it is deployed as a Worker var.
   The edge cache key includes it and edge entries are kept for a year, so a deploy busts
   everything at once.
