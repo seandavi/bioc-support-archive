@@ -109,7 +109,27 @@ class Site:
 
     def author(self, p):
         u = self.users.get(p["author_id"])
-        return e(u["name"] if u else "unknown")
+        return f'<a href="/u/{u["uid"]}/">{e(u["name"])}</a>' if u else "unknown"
+
+    def user_page(self, u, posts):
+        """The old site's /u/<uid>/ profile, reduced to the published fields (ADR 3) and the user's posts."""
+        by_type = defaultdict(list)
+        for p in posts:
+            by_type["Comment" if p["type"] == 6 else "Answer" if p["type"] == 1 else "Question"].append(p)
+        accepted = sum(p["accept_count"] > 0 for p in by_type["Answer"])
+        stats = "".join(f"<dt>{k}s</dt><dd>{num(len(by_type[k]))}</dd>" for k in ("Question", "Answer", "Comment"))
+
+        def items(ps):
+            return "<ol class=listing>" + "".join(
+                f'<li><a href="/p/{self.by_id[p["root_id"]]["uid"]}/{"" if p["is_toplevel"] else "#" + p["uid"]}">'
+                f'{e(self.by_id[p["root_id"]]["title"])}</a><small>{p["creation_date"][:10]} &middot; {p["vote_count"]} votes'
+                f'{" &middot; accepted" if p["type"] == 1 and p["accept_count"] > 0 else ""}</small></li>'
+                for p in sorted(ps, key=lambda p: p["creation_date"], reverse=True)) + "</ol>"
+        sections = "".join(f"<section><h2>{k}s ({num(len(by_type[k]))})</h2>{items(by_type[k])}</section>"
+                           for k in ("Question", "Answer") if by_type[k])
+        return page(u["name"], f'<h1>{e(u["name"])}</h1>'
+                    f'<dl class="stats"><dt>Joined</dt><dd>{u["date_joined"][:10]}</dd>{stats}'
+                    f'<dt>Accepted answers</dt><dd>{num(accepted)}</dd></dl>{sections}')
 
     def collect(self, p, anchor, answers, comments):
         """Answers anywhere in the thread become cards; comments attach to the nearest card above them."""
@@ -169,6 +189,12 @@ class Site:
         """Yield (relative path, text) for every output file except the Pagefind index."""
         for r in self.roots:
             yield f"p/{r['uid']}/index.html", self.thread_page(r)
+        by_author = defaultdict(list)
+        for p in self.posts:
+            by_author[p["author_id"]].append(p)
+        for uid, ps in by_author.items():
+            if uid in self.users:
+                yield f"u/{self.users[uid]['uid']}/index.html", self.user_page(self.users[uid], ps)
         redirects = {p["uid"]: self.by_id[p["root_id"]]["uid"] for p in self.posts if not p["is_toplevel"]}
         yield "redirects.json", json.dumps(redirects, separators=(",", ":"))
         top = sorted(self.roots, key=lambda r: -r["thread_votecount"])[:50]

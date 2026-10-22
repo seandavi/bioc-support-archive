@@ -56,6 +56,11 @@ footer { margin-top: 3rem; padding: 1.2rem 1rem 2rem; color: var(--muted); font-
 .listing li { margin: .45rem 0; }
 .listing small { display: block; color: var(--muted); font-size: .82rem; }
 
+/* user */
+.stats { display: grid; grid-template-columns: auto 1fr; gap: .25rem .8rem; max-width: 20rem; }
+.stats dt { color: var(--muted); }
+.stats dd { margin: 0; }
+
 /* thread */
 .layout { display: grid; grid-template-columns: minmax(0, 1fr) 15rem; gap: 2.5rem; }
 aside { padding-top: 4.2rem; font-size: .9rem; }
@@ -71,12 +76,13 @@ aside dd { margin: 0; }
 .votes .check { color: var(--accept); font-size: 1.5rem; margin-top: .3rem; }
 .answers-head { border-top: 2px solid var(--line); padding-top: 1rem; margin-bottom: 0; }
 .byline { color: var(--muted); font-size: .85rem; margin-top: .6rem; text-align: right; }
-.byline b { color: var(--ink); font-weight: 600; }
+.byline b, .byline b a { color: var(--ink); font-weight: 600; }
 .comments { list-style: none; margin: .8rem 0 0; padding: 0; border-top: 1px solid var(--line); font-size: .9rem; }
 .comments li { padding: .45rem 0 .45rem .2rem; border-bottom: 1px solid var(--line); }
 .comments .content, .comments .content p:last-child { display: inline; }
 .comments .content p { margin: 0 0 .4rem; }
 .comments .who { color: var(--muted); font-size: .82rem; margin-left: .3rem; }
+.comments .who a { color: inherit; }
 :target { scroll-margin-top: 4.5rem; }
 li:target, article:target { outline: 2px solid var(--green); outline-offset: 4px; border-radius: 4px; }
 
