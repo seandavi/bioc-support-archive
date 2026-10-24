@@ -271,7 +271,9 @@ def main(db_path, out, force=False, sample=0):
 if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser()
-    ap.add_argument("db"); ap.add_argument("out")
-    ap.add_argument("--force", action="store_true"); ap.add_argument("--sample", type=int, default=0)
+    ap.add_argument("db")
+    ap.add_argument("out")
+    ap.add_argument("--force", action="store_true")
+    ap.add_argument("--sample", type=int, default=0)
     a = ap.parse_args()
     main(a.db, a.out, a.force, a.sample)
