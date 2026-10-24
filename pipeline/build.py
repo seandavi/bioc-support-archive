@@ -31,7 +31,7 @@ TYPES = {0: "Question", 1: "Answer", 2: "Job", 6: "Comment", 8: "Tutorial", 11: 
 # "load more", so result lists are capped. Add paging if people need to go past the top hits.
 MAX_RESULTS, MAX_MODAL_RESULTS = 100, 50
 MIN_TAG_FILTER = 50  # ponytail: only common tags become search filters; 11k tags would swamp the filter list
-OLD_HOST = re.compile(r"https?://(?:www\.)?support\.bioconductor\.org(?=[/\"'?#<\s]|$)", re.I)
+OLD_HOST = re.compile(r"https?://(?:www\.)?support\.bioconductor\.org(?=[/\"'?#<\s]|$)", re.IGNORECASE)
 e = html.escape
 CSS = Path(__file__).with_name("style.css").read_text()
 CSS_PATH = f"style.{hashlib.sha256(CSS.encode()).hexdigest()[:10]}.css"  # fingerprinted: browsers may cache forever

@@ -47,6 +47,14 @@ just test                    # Python tests
 - Changes to **what gets published** (the filters in `pipeline/export.py`) or to URL behavior
   need an update to the matching ADR in `docs/adr/`. Changes to the public subset get extra review,
   because they can expose data that was never public.
-- Python style: `uvx ruff check` and `uvx ruff format`. TypeScript: match the surrounding code.
+- CI (`.github/workflows/ci.yml`) runs three checks on every pull request and push to `main`;
+  run them locally before pushing:
+  - `just test`: Python tests, which use small synthetic fixtures and never the real dump;
+  - `uv run ruff check pipeline`: lint (ruff is pinned in `uv.lock`);
+  - `cd worker && npm ci && npx wrangler deploy --dry-run`: bundles the Worker without deploying.
+
+  CI uses no secrets and has no access to the dump or `data/`, so it runs the same way on
+  pull requests from forks.
+- Python formatting: `uv run ruff format pipeline`. TypeScript: match the surrounding code.
 
 By contributing, you agree that your contributions are licensed under the [MIT License](LICENSE).

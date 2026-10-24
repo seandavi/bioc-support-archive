@@ -8,7 +8,7 @@ import sys
 
 import duckdb
 
-PAT = re.compile(r"""(?:https?://(?:www\.)?support\.bioconductor\.org)?(/media/images/[\w\-./]+)""", re.I)
+PAT = re.compile(r"""(?:https?://(?:www\.)?support\.bioconductor\.org)?(/media/images/[\w\-./]+)""", re.IGNORECASE)
 
 con = duckdb.connect(sys.argv[1], read_only=True)
 paths = set()
