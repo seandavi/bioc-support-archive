@@ -66,5 +66,5 @@ data/                    dumps, exports, builds, images — gitignored, never co
   PRs say `Closes #<n>`. One change per PR; describe what you checked.
 - Small, well-described commits; code commits carry a `Co-Authored-By` trailer when an agent wrote
   them. Never `git stash`. Never force-push `main`. Never commit `data/`.
-- Issues and PRs waiting on a person carry the `needs:human` label. The factory workflow is in
-  [.pi/factory.md](.pi/factory.md).
+- Issues and PRs waiting on a person carry the `needs:human` label. The pi-crucible workflow is described in
+  [.pi/crucible.md](.pi/crucible.md).
