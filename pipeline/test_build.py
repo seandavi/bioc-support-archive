@@ -12,6 +12,7 @@ def test_rewrite_links():
 
 def test_user_page(tmp_path):
     import sqlite3
+
     from build import Site
     db = tmp_path / "t.sqlite"
     con = sqlite3.connect(db)
@@ -33,3 +34,6 @@ def test_user_page(tmp_path):
     asker = pages["u/10/index.html"]
     assert "<dt>Questions</dt><dd>1</dd>" in asker and "<dt>Comments</dt><dd>1</dd>" in asker
     assert 'href="/u/20/"' in pages["p/100/index.html"]
+    # newest-first search (#13): threads carry a date sort key; the search page has the toggle
+    assert 'data-pagefind-sort="date">2012-01-01<' in pages["p/100/index.html"]
+    assert 'id="newest"' in pages["search/index.html"] and 'sort: { date: "desc" }' in pages["search/index.html"]
