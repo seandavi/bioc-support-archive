@@ -18,4 +18,5 @@ Codes come from biostar-central `forum/models.py` and `accounts/models.py`. Note
 `spam=0` means SPAM, and `status=3` means CLOSED, not deleted.
 
 ## Consequences
-Profile pages could be added later from the full DuckDB file if they're wanted.
+Profile pages (`/u/<uid>/`, issue #4) are built from these fields only. Score/reputation,
+role, bio, location and last-seen are not shown.
