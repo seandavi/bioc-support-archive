@@ -166,7 +166,7 @@ class Site:
             f'<span hidden data-pagefind-filter="type">{kind}</span>',
             f'<span hidden data-pagefind-filter="year">{date[:4]}</span>',
             *(f'<span hidden data-pagefind-filter="tag">{e(t)}</span>' for t in tags if t in self.filter_tags),
-            f'<span hidden data-pagefind-meta="date">{date}</span>',
+            f'<span hidden data-pagefind-meta="date" data-pagefind-sort="date">{date}</span>',
             f'<span hidden data-pagefind-meta="type">{kind}</span>',
             f'<span hidden data-pagefind-meta="answers">{len(answers)}</span>',
         ]) + "</div>"
@@ -219,7 +219,9 @@ Bioconductor community, 2001&ndash;2026.</p>
 <pagefind-filter-dropdown filter="tag" label="Tag" sort="count-desc"></pagefind-filter-dropdown>
 </div>
 <pagefind-summary></pagefind-summary>
-<p class="hint">Ranked by relevance; the top {MAX_RESULTS} are listed. Add words or filters to narrow the search.</p>
+<label class="newest"><input type="checkbox" id="newest"> Newest first</label>
+<p class="hint">Ranked by relevance unless &ldquo;Newest first&rdquo; is ticked; the top {MAX_RESULTS} are listed.
+Add words or filters to narrow the search.</p>
 <pagefind-results max-results="{MAX_RESULTS}"><script type="text/pagefind-template">
 <li class="result"><a class="result-title" href="{{{{ meta.url | default(url) | safeUrl }}}}">{{{{ meta.title }}}}</a>
 <div class="result-meta">{{{{ meta.type }}}} &middot; {{{{ meta.date }}}} &middot; {{{{ meta.answers }}}} answers</div>
@@ -235,13 +237,26 @@ if (!search.availableFilters) await new Promise((r) => {{ search.on("filters", (
 search.faceted = true;
 const params = new URLSearchParams(location.search);
 const q = params.get("q") ?? "", tags = params.getAll("tag");
-if (q || tags.length) search.triggerSearchWithFilters(q, tags.length ? {{ tag: tags }} : {{}});
-search.on("search", (term, filters) => {{
+// ponytail: the Component UI (Pagefind 1.5.2) never passes `sort` to pagefind.search(), so wrap its private
+// handle on the core API. Re-check after a Pagefind upgrade; drop this if the instance gains a sort option.
+const newest = document.getElementById("newest");
+newest.checked = params.get("sort") === "new";
+const pf = search.__pagefind__, pfSearch = pf.search.bind(pf);
+pf.search = (term, opts) => pfSearch(term, newest.checked ? {{ ...opts, sort: {{ date: "desc" }} }} : opts);
+const sync = () => {{
   const u = new URL(location.href); u.search = "";
-  if (term) u.searchParams.set("q", term);
-  for (const t of filters?.tag ?? []) u.searchParams.append("tag", t);
+  if (search.searchTerm) u.searchParams.set("q", search.searchTerm);
+  for (const t of search.searchFilters?.tag ?? []) u.searchParams.append("tag", t);
+  if (newest.checked) u.searchParams.set("sort", "new");
   history.replaceState(null, "", u);
+}};
+newest.addEventListener("change", () => {{
+  sync();
+  if (search.searchTerm || Object.values(search.searchFilters ?? {{}}).some((v) => v.length))
+    search.triggerSearchWithFilters(search.searchTerm, search.searchFilters ?? {{}});
 }});
+if (q || tags.length) search.triggerSearchWithFilters(q, tags.length ? {{ tag: tags }} : {{}});
+search.on("search", sync);
 </script>""")
         yield "404.html", page("Not found", "<h1>Not found</h1><p>That page is not in the archive. Try the search above.</p>")
         yield CSS_PATH, CSS

@@ -100,6 +100,7 @@ li:target, article:target { outline: 2px solid var(--green); outline-offset: 4px
 /* search page */
 .filters { display: flex; flex-wrap: wrap; gap: .5rem; margin: .8rem 0; }
 pagefind-summary { display: block; margin: .6rem 0 .2rem; }
+.newest { display: block; font-size: .9rem; margin: .4rem 0 .2rem; }
 .hint { color: var(--muted); font-size: .8rem; margin: 0 0 .4rem; }
 pagefind-results { color: var(--ink); } /* Pagefind resets it to CanvasText (black), even in dark mode */
 .result { list-style: none; padding: .8rem 0; border-bottom: 1px solid var(--line); }
